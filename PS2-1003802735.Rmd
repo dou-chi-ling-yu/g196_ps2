@@ -1,0 +1,145 @@
+---
+title: "How do people feel about their lives and what factor(s) may affect?"
+author: "Zhengyu Ren (1003802735) & Zhiyuan Liu(1001439678)"
+date: "2020.10.19"
+output:
+  html_document:
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+install.packages("tidyverse")
+install.packages("dplyr")
+library(tidyverse)
+library(dplyr)
+mgss <- read.csv("gss.csv")
+```
+
+## How do people feel about their lives and what factor(s) may affect?
+
+# Name(s) of Author(s): Zhengyu Ren(1003802735), Zhiyuan Liu(1001439678)
+                       
+# Date: 2020.10.19
+
+## Abstract
+In this report, we are going to analyze the factors influencing a person's feeling about life. Some of the factors considered are self-rated mental health, self-rated health and the frequency of religious activities. We found out that mental health, physical health and whether taking religious activities are indicators of attitudes of life.
+
+## Introduction
+
+It is suggested that one's feelings of life is influenced by many factors, such as physical factors like exercise, diet, and hygiene, social factors like social contact and social supports (2). In this report, we attempt to analyze some of the relevant factors and the impact of them. We choose the frequency of religious activity because religious activities are considered for reflecting a person's pursuing of meaning in lives, thus we anticipate and proved that a participant of religious activities is likely to rate himself high on feeling of lives. However, we reject the hypothesis is that if a person is both very good in mental and physical health, he will be have higher possibility to be satisfied of life. 
+
+
+## Data
+In this data set, 20602 observations were collected, ignoring the invalid data, 23.0% (4654 respondents) responded satisfied with their lives and 15603 reported the contrary.
+We have selected 3 variables from the 200+ variables of the data-set of "General Social Survey, Cycle 31: 2017: Family". They are mental health level, health level, and frequency of doing religious activity of the respondent.  However, to get a more comprehensive understanding of the data, more information and factors may be taken into concern, such as the the number of child one have to raise, the marriage status may affect indirectly on the mental health, or there are some factors that cannot be measured statistically such as genetic factors. Some of these factors may seem minor, but they contribute to the result and conclusion in various ways as the living conditions vary from individual to individual. 
+The modified data set looks like below:
+```{r,echo=F}
+head(mgss)
+```
+
+
+## Model
+Since we want to test the relationship between the feelings of lives and the contributing factors, we are using a logit regression here as the response variables and the predictor variables are categorical variables. 
+In this section, we are going to investigate three factors and their influences on feelings of life.
+
+1.self rated health level
+
+```{r}
+echo = F
+
+mylogit<-glm(feelings_life ~ as.factor(self_rate_health), 
+data=mgss, family="binomial")
+
+summary(mylogit)
+```
+Thus, we have the log(p/(1-p)) = -0.453 + (-1.403) * self_rate_health(Fair) + (-1.13)*self_rate_health(Good) + 
+(-1.72) * self_rate_health(Poor) + (-0.790) * self_rate_health(Very Good), where p is the possibility for the respondent to answer "Satisfied for life". 
+
+2.mental health 
+```{r}
+echo = F
+
+mylogit<-glm(feelings_life ~ as.factor(self_rate_mental), 
+data=mgss, family="binomial")
+
+summary(mylogit)
+```
+Thus, we have the log(p/(1-p)) = -0.396 + (-2.514) * self_rate_mental(Fair) + (-1.462)*self_rate_mental(Good) + 
+(-2.649) * self_rate_mental(Poor) + (-1.009) * self_rate_mental(Very Good), where p is the possibility for the respondent to answer "Satisfied for life". 
+
+
+3. mental health and physical health at one time
+```{r}
+echo = F
+
+mylogit<-glm(feelings_life ~ as.factor(self_rate_health) + as.factor(self_rate_mental),
+data=mgss, family="binomial")
+
+summary(mylogit)
+```
+log(p/(1-p)) = -0.17 + (-2.19) * self_rate_mental(Fair) + (-1.22)*self_rate_mental(Good) + 
+(-2.32) * self_rate_mental(Poor) + (-0.86) * self_rate_mental(Very Good)+ (-0.63) * self_rate_health(Fair) + (-0.52)*self_rate_health(Good) + 
+(-0.83) * self_rate_health(Poor) + (-0.38) * self_rate_health(Very Good), where p is the possibility for the respondent to answer "Satisfied for life". 
+
+4. Religious activities
+```{r}
+echo = F
+
+mylogit<-glm(feelings_life ~ as.factor(religious_activities), 
+data=mgss, family="binomial")
+
+summary(mylogit)
+```
+Thus, we have the log(p/(1-p)) = -1.22 + (0.137) * religious_activities(At least once a month) + (0.329)*religious_activities(At least once a week) + 
+(0.435) * religious_activities(NA) + (-0.114) * religious_activities(Not at all) + (-0.095)* religious_activities(Once or twice a year), where p is the possibility for the respondent to answer "Satisfied for life".
+
+## Results
+
+1. Health level and the feeling of life
+
+Recall, we have the logistic regression function: log(p/(1-p)) = -0.453 + (-1.403) * self_rate_health(Fair) + (-1.13)*self_rate_health(Good) + 
+(-1.72) * self_rate_health(Poor) + (-0.790) * self_rate_health(Very Good), where p is the possibility for the respondent to answer "Satisfied for life". 
+
+Through this equation, we can predict the probability for a person to have a better attitude for lives given the answer of his self-rated health level. For example, if a person rate his health level as Very Good, the probability for him to have a positive feeling of life is 0.224, but if a person rate his health level as Poor, the probability for him to have a positive feeling of life is 0.102.
+Also we can see, the β coefficient before each x is decreasing corresponding to the level of self-rated health level (i.e. -0.79 > -1.13 > -1.40 > -1.72, Very Good > Good > Fair > Poor), making p decreasing too. Therefore, though this health level may not be a very important factor for attitudes of life (since the largest coefficient only contributes to 0.22 possibility of positive outcome), they are positive correlated.
+
+2.Mental health level and the feeling of life
+
+Recall that we have the logistic regression function: log(p/(1-p)) = -0.396 + (-2.514) * self_rate_mental(Fair) + (-1.462)*self_rate_mental(Good) + 
+(-2.649) * self_rate_mental(Poor) + (-1.009) * self_rate_mental(Very Good), where p is the possibility for the respondent to answer "Satisfied for life". 
+
+Through this equation, we can predict the probability for a person to have a better attitude for lives given the answer of his self-rated mental health level. For example, if a person rate his mental health level as Very Good, the probability for him to have a positive feeling of life is 0.325, but if a person rate his health level as Poor, the probability for him to have a positive feeling of life is 0.0500, which implies that a person with poor mental health is very unlikly to have a positive attitude towards life.
+Also we can see, the β coefficient before each x is decreasing corresponding to the level of self-rated health level, making p decreasing too. Therefore, they are positive correlated.
+Comparing this data to what we have in physical health level, we can see mental health is a more significant factor. 
+
+3. The logit function modeling mental health rate and physical health rate at one time gives us a insightful result, which shows that if a person rate himself both very good in mental health and physical health, he will no necessarily have a higher possibility in being satisfied with life than only good in one of the mental health and physical health. In this case, if a person choose both very good, his possibility of choosing satisfied with life is only 0.19, which is lower than only "very good" in mental health and physical health, this shows that there are other factors contributing greatly to it.
+
+4.Religious activities
+
+Recall that we have the log(p/(1-p)) = -1.22 + (0.137) * religious_activities(At least once a month) + (0.329)*religious_activities(At least once a week) + 
+(0.435) * religious_activities(NA) + (-0.114) * religious_activities(Not at all) + (-0.095)* religious_activities(Once or twice a year), where p is the possibility for the respondent to answer "Satisfied for life".
+
+Through this logistic regression function we can see that if a person take part in religious activity at least once a week, his answer for whether he is satisfied with life is "yes" is 0.29, meanwhile his counterparts who do not take religious activities at all is 0.21.
+
+
+## Discussion
+Through the relationships investigated above, we can see and accept our hypothesis that all of these three factors are positive correlated with feelings of life. In the three chosen factors, mental health is the most contributing factor to a person's attitude of life.
+
+# Weaknesses
+
+The weakness in this study is that the data in "satisfaction of lives" blocked further investigation of this topic, as it only gives two options of "satisfy" and "not". Therefore it could affect all the hierarchical result of finding the factors which influence the feeling of life. It would be more interesting if there are more options in answering the question, or a scale of satisfaction to see how people are satisfied about their lives.
+
+# Next Steps
+
+In continuing studying the factors that influencing people's feeling about life, a specific survey with a numerical scale of satisfaction could be designed to follow up the finding. Logistic regression is also a good model for categorical variables. it would be interesting to see the result of logistic regression model.
+
+
+## References
+(1) A.Bień et al., Factors Affecting the Quality of Life and the Illness Acceptance of Pregnant Women with Diabetes
+ https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4730459/
+ 
+(2) Better Health Channel, https://www.betterhealth.vic.gov.au/,
+ https://www.betterhealth.vic.gov.au/health/healthyliving/wellbeing
+ 
+
